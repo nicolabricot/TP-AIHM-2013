@@ -29,7 +29,7 @@ public class LiftView extends JPanel {
 		setBackground(Color.WHITE);
 		
 		this.initButtons(button);
-		JLabel l = new JLabel("Ascenceur");
+		JLabel l = new JLabel("Ascenseur");
 		l.setBounds(Lift.WIDTH()/2 - 30, 10, 80, 20);
 		this.add(l);
 	}
