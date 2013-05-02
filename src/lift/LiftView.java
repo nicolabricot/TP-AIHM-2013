@@ -19,6 +19,7 @@ public class LiftView extends JPanel {
 	protected static final int gutter = 2;
 	private final int gutterButton = 5;
 	private int position = 0;
+	private int door = 0;
 	
 	/**
 	 * Constructor which needs the buttons to display
@@ -55,6 +56,15 @@ public class LiftView extends JPanel {
 		repaint();
 	}
 	
+	/**
+	 * Repaint cage lift after open/close door
+	 * @param value
+	 */
+	public void changeDoor(int value) {
+		this.door = value;
+		repaint();
+	}
+	
 	@Override
 	/**
 	 * Paint component
@@ -85,13 +95,20 @@ public class LiftView extends JPanel {
 		graphics.setColor(Color.BLACK);
 		int x = Lift.WIDTH()/2 - cage.width/2;
 		int y = Lift.HEIGHT()/2 - (cage.height * Lift.FLOOR())/2 + cage.height*(Lift.FLOOR()-1) + gutter - this.position;
+		
 		graphics.drawRect(x, y, cage.width, cage.height - 2*gutter);
 		
-		graphics.setColor(Color.ORANGE);
-		graphics.fillRect(x + 1, y + 1, cage.width - 1, cage.height - 2*gutter - 1);
+		graphics.drawRect(x, y, cage.width/2 - door, cage.height - 2*gutter);
+		graphics.drawRect(x + cage.width/2 + door, y, cage.width/2 - door, cage.height - 2*gutter);
 		
+		graphics.setColor(Color.ORANGE);
+		graphics.fillRect(x + 1, y + 1, cage.width/2 - 1 - door, cage.height - 2*gutter - 1);
+		graphics.fillRect(x + cage.width/2 + 1 + door, y + 1, cage.width/2 - 1 - door, cage.height - 2*gutter - 1);
+		
+		/*
 		graphics.setColor(Color.GRAY);
 		graphics.drawLine(x + cage.width/2, y + 1, x + cage.width/2, y + cage.height - gutter - 3);
+		*/
 	}	
 
 }

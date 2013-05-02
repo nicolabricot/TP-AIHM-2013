@@ -15,15 +15,15 @@ public class Lift {
 	private LiftView view;
 	protected static Dimension CAGE = new Dimension(80, FLOOR() > 4 ? 70 : 100);
 	
-	private enum Sens {UP, DOWN, STOPPED};
-	private Sens sens = Sens.STOPPED;
+	private enum Sens {UP, DOWN, STOP, PAUSE};
+	private Sens sens = Sens.STOP;
+	private enum Door {CLOSE, OPEN, OPENING, CLOSING};
+	private Door state = Door.CLOSE;
 	
 	private int position = 0;
+	private int door = 0;
 	private TreeSet<Integer> destinations = new TreeSet<Integer>();
 	private final int floorHeight = CAGE.height;
-	private final int MAX = FLOOR() * CAGE.height - CAGE.height;
-	
-	private int pause = 0;
 	
 	/**
 	 * Constructor
@@ -61,37 +61,50 @@ public class Lift {
 			if (this.destinations.contains(floor)) {
 				this.destinations.remove(floor);
 				this.appli.updateButton(floor);
-				this.pause = 30;
+				this.sens = Sens.PAUSE;
+				this.state = Door.OPENING;
 			}
 			this.appli.updateFloorText(floor);
 		}
 		
-		// to avoid any out of range (normally not necessary, but i prefer to be careful)
-		if (this.position >= this.MAX) {
-			this.sens = Sens.STOPPED;
-			this.destinations.remove(FLOOR()-1);
-			this.appli.updateButton(FLOOR()-1);
-		}
-		else if (this.position <= 0) {
-			this.sens = Sens.STOPPED;
-			this.destinations.remove(0);
-			this.appli.updateButton(0);
-		}
-		
 		// what should we do?
-		if (this.pause > 0) {
-			// fake open/close door
-			this.pause--;
+		if (this.sens == Sens.PAUSE) {
+			this.doorMotion();
 		}
 		else {
 			// we can move
 			if (! this.destinations.isEmpty())
 				this.choseSens();
 			else
-				this.sens = Sens.STOPPED;
+				this.sens = Sens.STOP;
 		}
 	}
 	
+	/**
+	 * Manage the opening/closing motion for the doors
+	 */
+	@SuppressWarnings("incomplete-switch")
+	private void doorMotion() {
+		switch (this.state) {
+        case OPENING:
+            if (this.door < CAGE.width / 2)
+                this.view.changeDoor(++this.door);
+            else {
+                this.state = Door.CLOSING;
+                this.view.changeDoor(--this.door);
+            }
+            break;
+        case CLOSING:
+            if (this.door > 0)
+                this.view.changeDoor(--this.door);
+            else {
+                this.state = Door.CLOSE;
+                this.sens = Sens.STOP;
+            }
+            break;
+        }
+	}
+
 	/**
 	 * Moving up please
 	 */
